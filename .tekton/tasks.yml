@@ -65,7 +65,7 @@ spec:
       description: The image name to build and push
   steps:
     - name: build
-      image: quay.io/buildah/stable:v1.24.1
+      image: registry.access.redhat.com/ubi8/buildah:latest
       command:
         - buildah
       args:
