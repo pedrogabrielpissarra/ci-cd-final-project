@@ -49,3 +49,30 @@ spec:
         python -m pip install --upgrade pip wheel
         pip install -r requirements.txt
         nosetests $(params.args)
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: buildah
+spec:
+  description: Build container image using buildah
+  workspaces:
+    - name: source
+  params:
+    - name: IMAGE
+      type: string
+      description: The image name to build and push
+  steps:
+    - name: build
+      image: quay.io/buildah/stable:v1.24.1
+      command:
+        - buildah
+      args:
+        - bud
+        - --tls-verify=false
+        - -f
+        - $(workspaces.source.path)/Dockerfile
+        - -t
+        - $(params.IMAGE)
+        - $(workspaces.source.path)
