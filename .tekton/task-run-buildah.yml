@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: buildah-test-run
+spec:
+  taskRef:
+    name: buildah
+  workspaces:
+    - name: source
+      persistentVolumeClaim:
+        claimName: oc-lab-pvc
+  params:
+    - name: IMAGE
+      value: image-registry.openshift-image-registry.svc:5000/sn-labs-pedropissarr/tekton-lab:latest
