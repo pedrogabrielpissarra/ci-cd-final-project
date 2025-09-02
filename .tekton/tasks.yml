@@ -66,6 +66,8 @@ spec:
   steps:
     - name: build
       image: registry.access.redhat.com/ubi8/buildah:latest
+      securityContext:
+        privileged: true
       command:
         - buildah
       args:
