@@ -1,3 +1,4 @@
+---
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -25,6 +26,7 @@ spec:
           rm -rf "${WORKSPACE_SOURCE_PATH}"/.[!.]*
           rm -rf "${WORKSPACE_SOURCE_PATH}"/..?*
         fi
+
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -54,27 +56,23 @@ spec:
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: buildah
+  name: kaniko-build
 spec:
-  description: Build container image using buildah
+  description: Build and push container image using Kaniko (no privileged required)
   workspaces:
     - name: source
   params:
     - name: IMAGE
       type: string
-      description: The image name to build and push
+      description: The full image reference to push
   steps:
-    - name: build
-      image: registry.access.redhat.com/ubi8/buildah:latest
-      securityContext:
-        privileged: true
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:latest
       command:
-        - buildah
+        - /kaniko/executor
       args:
-        - bud
-        - --tls-verify=false
-        - -f
-        - $(workspaces.source.path)/Dockerfile
-        - -t
-        - $(params.IMAGE)
-        - $(workspaces.source.path)
+        - --dockerfile=$(workspaces.source.path)/Dockerfile
+        - --destination=$(params.IMAGE)
+        - --context=$(workspaces.source.path)
+        - --insecure
+        - --skip-tls-verify
